@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { InterfaceAbi, ethers } from "ethers";
+import { ethers } from "ethers";
 import AssetTokenizationArtifact from "../artifacts/AssetTokenization.json";
 import { AssetTokenization as AssetTokenizationType } from "../types";
 import { getEthereum } from "../utils/ethereum";
@@ -31,7 +31,7 @@ export const useContract = ({
     const getContract = useCallback(
         (
             contractAddress: string,
-            abi: InterfaceAbi,
+            abi: any,
             storeContract: (_: ethers.Contract) => void
         ) => {
             if (!ethereum) {
