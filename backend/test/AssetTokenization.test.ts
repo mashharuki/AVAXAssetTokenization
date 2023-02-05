@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 import { BigNumber, Overrides } from "ethers";
 import { expect } from "chai";
-import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 
 describe("AssetTokenization", function () {
     const oneWeekInSecond = 60 * 60 * 24 * 7;
@@ -118,6 +118,52 @@ describe("AssetTokenization", function () {
                 .connect(buyer)
                 .buyNft(farmer.address, { value: price } as Overrides)
             ).to.changeEtherBalances([farmer, buyer], [price, -price]);
+        });
+    });
+
+    describe("upkeep", function () {
+        it("checkUpkeep and performUpkeep", async function () {
+            const { userAccounts, assetTokenization } = await loadFixture(
+                deployContract
+            );
+        
+            // 定数用意
+            const farmer = userAccounts[0];
+            const farmerName = "farmer";
+            const description = "description";
+            const totalMint = BigNumber.from(5);
+            const price = BigNumber.from(100);
+            const expirationDate = BigNumber.from(Date.now())
+                .div(1000) // in second
+                .add(oneWeekInSecond); // one week later
+        
+            // nftコントラクトをデプロイ
+            await assetTokenization
+                .connect(farmer)
+                .generateNftContract(
+                    farmerName,
+                    description,
+                    totalMint,
+                    price,
+                    expirationDate
+                );
+        
+            const [return1] = await assetTokenization.checkUpkeep("0x00");
+        
+            // この時点では期限切れのnftコントラクトがないのでfalse
+            expect(return1).to.equal(false);
+        
+            // ブロックチェーンのタイムスタンプを変更(期限の1s後のタイムスタンプを含んだブロックを生成)し, nftコントラクトの期限が切れるようにします。
+            await time.increaseTo(expirationDate.add(1));
+        
+            const [return2] = await assetTokenization.checkUpkeep("0x00");
+        
+            // 期限切れのnftコントラクトがあるのでtrue
+            expect(return2).to.equal(true);
+        
+            await assetTokenization.performUpkeep("0x00");
+            // 期限切れのnftコントラクトの情報は取得できない
+            await expect(assetTokenization.getNftContractDetails(farmer.address)).to.be.reverted;
         });
     });
 });

@@ -3,11 +3,12 @@ pragma solidity ^0.8.17;
 
 import "./FarmNft.sol";
 import "hardhat/console.sol";
+import "@chainlink/contracts/src/v0.8/AutomationCompatible.sol";
 
 /**
  * AssetTokenization Contract
  */
-contract AssetTokenization {
+contract AssetTokenization is AutomationCompatibleInterface {
     address[] farmers; 
     mapping(address => FarmNft) farmerToNftContract; 
 
@@ -124,5 +125,56 @@ contract AssetTokenization {
      */
     function getFarmers() public view returns (address[] memory) {
         return farmers;
+    }
+
+    /**
+     * checkUpkeep function
+     * For upkeep that chainlink automation function.
+     * Check whether there are expired contracts.
+     * If checkUpkeep() returns true, chainlink automatically runs performUpkeep() that follows below.
+     */
+    function checkUpkeep(
+        bytes calldata /* optional data. */
+    )
+        external
+        view
+        override
+    returns (
+            bool upkeepNeeded,
+            bytes memory /* optional data. */
+    ){
+        for (uint256 index = 0; index < farmers.length; index++) {
+            address farmer = farmers[index];
+            if (!availableContract(farmer)) {
+                continue;
+            }
+            // check expire
+            if (farmerToNftContract[farmer].isExpired()) {
+                return (true, "");
+            }
+        }
+        return (false, "");
+    }
+
+    /**
+     * performUpkeep function
+     * For chainlink.
+     * Burn expired NFT and delete NFT Contract.
+     */
+    function performUpkeep(
+        bytes calldata /* optional data. */
+    ) external override {
+        for (uint256 index = 0; index < farmers.length; index++) {
+            address farmer = farmers[index];
+            if (!availableContract(farmer)) {
+                continue;
+            }
+            if (farmerToNftContract[farmer].isExpired()) {
+                // burn NFT
+                farmerToNftContract[farmer].burnNFT();
+                // delete
+                delete farmerToNftContract[farmer];
+            }
+        }
     }
 }

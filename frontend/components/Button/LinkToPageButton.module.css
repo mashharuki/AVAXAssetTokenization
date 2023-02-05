@@ -1,0 +1,19 @@
+.icon_left {
+    padding: 10px;
+}
+  
+.icon_right {
+    padding-top: 20px;
+}
+  
+.button {
+    display: flex;
+    width: fit-content;
+}
+  
+.button:hover {
+    border-style: solid;
+    border-color: aliceblue;
+    border-radius: 10px;
+    border-width: 5px;
+}
