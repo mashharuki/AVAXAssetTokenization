@@ -147,7 +147,7 @@ export default function TokenizeForm() {
             <div className={styles.field_button}>
                 <ActionButton
                     title={"Generate NFT"}
-                    onClick={() => onClickGenerateNFT()}
+                    onClick={onClickGenerateNFT}
                     disable={false}
                 />
             </div>

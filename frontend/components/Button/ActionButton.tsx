@@ -15,7 +15,7 @@ export default function ActionButton({ title, onClick, disable }: Props) {
     return (
         <button
             className={styles.button}
-            onClick={onClick}
+            onClick={() => onClick()}
             disabled={disable}
         >
             {title}
