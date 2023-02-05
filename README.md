@@ -6,4 +6,5 @@ Avalancheと連装するAVAXAssetTokenizationアプリケーションです。
 農家とその収穫物を購入する購入者を対象に, NFTの作成と購入ができるアプリ。
 
 ### 参考文献
-1. [UNCHAIN Docs](https://app.unchain.tech/learn/AVAX-Asset-Tokenization/section-1_lesson-1/)å
+1. [UNCHAIN Docs](https://app.unchain.tech/learn/AVAX-Asset-Tokenization/section-1_lesson-1/)
+2. [hardhat - Testing contracts](https://hardhat.org/hardhat-runner/docs/guides/test-contracts)
