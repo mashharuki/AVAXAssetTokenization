@@ -1,0 +1,2 @@
+# AVAXAssetTokenization
+Avalancheと連装するAVAXAssetTokenizationアプリケーションです。
